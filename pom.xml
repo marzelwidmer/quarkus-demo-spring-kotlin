@@ -2,11 +2,9 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>ch.keepcalm</groupId>
   <artifactId>quarkus-demo-spring-kotlin</artifactId>
   <version>1.0-SNAPSHOT</version>
-
   <properties>
     <compiler-plugin.version>3.8.1</compiler-plugin.version>
     <kotlin.version>1.3.21</kotlin.version>
@@ -21,7 +19,6 @@
     <quarkus.platform.version>1.0.1.Final</quarkus.platform.version>
     <surefire-plugin.version>2.22.1</surefire-plugin.version>
   </properties>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -33,8 +30,6 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-<!-- Dependencies -->
   <dependencies>
     <dependency>
       <groupId>io.quarkus</groupId>
@@ -68,11 +63,9 @@
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
-      <artifactId>quarkus-resteasy-jsonb</artifactId>
+      <artifactId>quarkus-resteasy-jackson</artifactId>
     </dependency>
   </dependencies>
-
-<!-- Build -->
   <build>
     <sourceDirectory>src/main/kotlin</sourceDirectory>
     <testSourceDirectory>src/test/kotlin</testSourceDirectory>
@@ -138,8 +131,6 @@
       </plugin>
     </plugins>
   </build>
-
-<!-- Profiles -->
   <profiles>
     <profile>
       <id>native</id>

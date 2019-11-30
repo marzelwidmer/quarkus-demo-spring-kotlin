@@ -7,7 +7,7 @@ mvn io.quarkus:quarkus-maven-plugin:1.0.1.Final:create \
     -DprojectArtifactId=quarkus-demo-spring-kotlin \
     -DclassName="ch.keepcalm.quarkus.GreetingResource" \
     -Dpath="/greeting" \
-    -Dextensions="kotlin,resteasy-jsonb"
+    -Dextensions="kotlin,resteasy-jackson"
 ```
 
 ## Add Spring Web and Spting DI extensions
