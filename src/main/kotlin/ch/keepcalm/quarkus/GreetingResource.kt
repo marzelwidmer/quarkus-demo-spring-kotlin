@@ -1,6 +1,8 @@
 package ch.keepcalm.quarkus
 
+import org.springframework.stereotype.Service
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import javax.ws.rs.GET
@@ -28,3 +30,26 @@ class HelloResource {
 
 }
 
+
+
+
+@RestController
+@RequestMapping("/hello")
+class GreetingController(private val greetingService: GreetingService) {
+
+    @GetMapping("/{name}")
+    fun hello(@PathVariable(name = "name") name: String): Greeting {
+        return Greeting(greetingService.greet(name))
+    }
+}
+
+
+class Greeting(val message: String)
+
+
+@Service
+class GreetingService{
+    fun greet(input: String): String {
+        return "HELLO " + input.toUpperCase() + "!...."
+    }
+}
