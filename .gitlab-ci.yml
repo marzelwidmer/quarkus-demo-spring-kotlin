@@ -5,7 +5,7 @@ stages:
 
 variables:
   OPENSHIFT_SERVER: https://console.c3smonkey.ch:8443
-  OPENSHIFT_DOMAIN: c3smonkey.ch
+  OPENSHIFT_DOMAIN: apps.c3smonkey.ch
   # Configure this variable in Secure Variables:
   OPENSHIFT_TOKEN: $OPENSHIFT_TOKEN
 
@@ -29,10 +29,10 @@ develop:
   tags:
     - docker
   variables:
-    APP: slides-openshift
-    APP_HOST: demo-slides.$OPENSHIFT_DOMAIN
+    APP: quarkus-quickstart-native
+    APP_HOST: development.$OPENSHIFT_DOMAIN
   environment:
-    name: develop
-    url: http://demo-slides.$OPENSHIFT_DOMAIN
+    name: development
+    url: http://quarkus-quickstart-native.$OPENSHIFT_DOMAIN
   except:
     - master
