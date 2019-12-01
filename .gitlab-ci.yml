@@ -20,8 +20,8 @@ foo_bar:
   stage: foo
   image: docker:latest
   script: |
-    echo $DOCKER_IMAGE_TAGGED
-    echo $DOCKER_IMAGE_LATEST
+    echo $gitlab-ci-token
+    echo $CI_COMMIT_SHA
   tags:
     - docker
 
