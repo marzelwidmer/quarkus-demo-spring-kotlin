@@ -1,10 +1,10 @@
 stages:
   - build
-  - test
+#  - test
   - package
-  - prepare
-  - deploy
-  - stop
+#  - prepare
+#  - deploy
+#  - stop
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
