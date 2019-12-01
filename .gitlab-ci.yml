@@ -1,3 +1,146 @@
+stages:
+  - build
+  - test
+  - package
+  - prepare
+  - deploy
+  - stop
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  POSTGRES_DB: enco
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  APP_URL: ${CI_PROJECT_ID}.run.innoq.io
+  APP_PORT: "8080"
+  DOCKER_IMAGE_TAGGED: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  DOCKER_IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
+
+cache:
+  paths:
+    - .m2/repository
+
+build_jar:
+  stage: build
+  image: maven:3-jdk-8
+  services:
+    - postgres:9.6
+  script:
+    - mvn install
+  artifacts:
+    paths:
+      - target/*.jar
+  tags:
+    - docker
+
+integration_test1:
+  stage: test
+  image: maven:3-jdk-8
+  services:
+    - postgres:9.6
+  script:
+    - mvn test
+  tags:
+    - docker
+
+integration_test2:
+  stage: test
+  image: maven:3-jdk-8
+  services:
+    - postgres:9.6
+  script:
+    - mvn test
+  tags:
+    - docker
+
+docker_push:
+  stage: package
+  image: docker:latest
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker build -t $DOCKER_IMAGE_TAGGED .
+    - docker push $DOCKER_IMAGE_TAGGED
+  dependencies:
+    - build_jar
+  tags:
+    - docker
+
+docker_tag:
+  stage: prepare
+  image: docker:latest
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker pull $DOCKER_IMAGE_TAGGED
+    - docker tag $DOCKER_IMAGE_TAGGED $DOCKER_IMAGE_LATEST
+    - docker push $DOCKER_IMAGE_LATEST
+  tags:
+    - docker
+  only:
+    - master
+
+deploy_review:
+  stage: deploy
+  image: innoq/gitlabci-docker-compose:alpine
+  variables:
+    APP_DEPLOY_URL: $CI_ENVIRONMENT_SLUG.$APP_URL
+    # add your other vars for DEV here!
+  script:
+    - sh ./scripts/prepare-docker-compose.sh > docker-compose.yml
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker-compose -p $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG up -d
+  dependencies:
+    - docker_push
+  tags:
+    - docker
+  except:
+    - master
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: https://$CI_ENVIRONMENT_SLUG.$APP_URL
+    on_stop: stop_review_app
+
+stop_review_app:
+  stage: stop
+  image: innoq/gitlabci-docker-compose:alpine
+  variables:
+    APP_DEPLOY_URL: $CI_ENVIRONMENT_SLUG.$APP_URL
+  script:
+    - sh ./scripts/prepare-docker-compose.sh > docker-compose.yml
+    - docker-compose -p $CI_PROJECT_NAME-$CI_COMMIT_REF_SLUG down
+  tags:
+    - docker
+  except:
+    - master
+  when: manual
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    action: stop
+
+deploy_prod:
+  stage: deploy
+  image: innoq/gitlabci-docker-compose:alpine
+  variables:
+    APP_DEPLOY_URL: $APP_URL
+    # add your other vars for PROD here!
+  script:
+    - sh ./scripts/prepare-docker-compose.sh > docker-compose.yml
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
+    - docker-compose -p $CI_PROJECT_NAME up -d
+  tags:
+    - docker
+  only:
+    - master
+  environment:
+    name: production
+    url: https://$APP_URL
+
+
+
+
+
+
+
+
 #image: docker:git
 #services:
 #  - docker:dind
@@ -24,19 +167,19 @@
 #  only:
 #    - tags
 
-stages:
-  - build
-
-
-maven-build:
-  image: maven:3-jdk-8
-  stage: build
-  script: |
-    ./mvnw package -B -Pnative -Dquarkus.native.container-build=true -DskipTests
-
-  artifacts:
-    paths:
-      - target/*.jar
+#stages:
+#  - build
+#
+#
+#maven-build:
+#  image: maven:3-jdk-8
+#  stage: build
+#  script: |
+#    ./mvnw package -B -Pnative -Dquarkus.native.container-build=true -DskipTests
+#
+#  artifacts:
+#    paths:
+#      - target/*.jar
 
 #
 #docker-build:
