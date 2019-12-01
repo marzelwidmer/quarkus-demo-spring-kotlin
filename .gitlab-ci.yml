@@ -7,7 +7,7 @@ variables:
   OPENSHIFT_SERVER: https://console.c3smonkey.ch:8443
   OPENSHIFT_DOMAIN: apps.c3smonkey.ch
   # Configure this variable in Secure Variables:
-  OPENSHIFT_TOKEN: $OPENSHIFT_TOKEN
+  OPENSHIFT_TOKEN: $TOKEN
 
 .deploy: &deploy
   before_script:
