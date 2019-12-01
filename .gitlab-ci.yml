@@ -6,7 +6,7 @@ variables:
 
 before_script:
   - docker login -u gitlab-ci-token -p "$CI_BUILD_TOKEN" "$CI_REGISTRY"
-  - ./mvnw package -B -Pnative -Dquarkus.native.container-build=true
+  - mvn package -B -Pnative -Dquarkus.native.container-build=true
 
 development:
   stage: deploy
