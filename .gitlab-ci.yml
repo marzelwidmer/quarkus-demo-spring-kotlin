@@ -4,26 +4,39 @@ services:
 variables:
   DOCKER_DRIVER: overlay
 
-before_script:
-  - docker login -u gitlab-ci-token -p "$CI_BUILD_TOKEN" "$CI_REGISTRY"
-  - mvn package -B -Pnative -Dquarkus.native.container-build=true
+#before_script:
+#  - docker login -u gitlab-ci-token -p "$CI_BUILD_TOKEN" "$CI_REGISTRY"
+#
+#development:
+#  stage: deploy
+#  script:
+#    - docker build -f src/main/docker/Dockerfile.native -t registry.gitlab.com/marzelwidmer/quarkus-demo-spring-kotlin .
+##    - docker build -t "$CI_REGISTRY_IMAGE:latest" .
+##    - docker push "$CI_REGISTRY_IMAGE:latest"
+#  only:
+#    - master
+#
+#stable:
+#  stage: deploy
+#  script:
+#    - docker build -t "$CI_REGISTRY_IMAGE:$(CI_BUILD_REF_NAME)" .
+#    - docker push "$CI_REGISTRY_IMAGE:$(CI_BUILD_REF_NAME)"
+#  only:
+#    - tags
 
-development:
-  stage: deploy
-  script:
-    - docker build -f src/main/docker/Dockerfile.native -t registry.gitlab.com/marzelwidmer/quarkus-demo-spring-kotlin .
-#    - docker build -t "$CI_REGISTRY_IMAGE:latest" .
-#    - docker push "$CI_REGISTRY_IMAGE:latest"
-  only:
-    - master
+stages:
+  - build
 
-stable:
-  stage: deploy
-  script:
-    - docker build -t "$CI_REGISTRY_IMAGE:$(CI_BUILD_REF_NAME)" .
-    - docker push "$CI_REGISTRY_IMAGE:$(CI_BUILD_REF_NAME)"
-  only:
-    - tags
+maven-build:
+  image: maven:3-jdk-8
+  stage: build
+  script: |
+    ./mvnw package -B -Pnative -Dquarkus.native.container-build=true
+
+  artifacts:
+    paths:
+      - target/*.jar
+
 
 
 #image: docker:latest
