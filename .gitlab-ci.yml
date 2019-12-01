@@ -32,14 +32,14 @@ build_jar:
       - target/*.jar
   tags:
     - docker
-
-build_native_image:
-  stage: build
-  image: maven:3-jdk-8
-  script:
-    - mvn package -B -Pnative -Dquarkus.native.container-build=true -DskipTests
-  tags:
-    - docker
+#
+#build_native_image:
+#  stage: build
+#  image: maven:3-jdk-8
+#  script:
+#    - mvn package -B -Pnative -Dquarkus.native.container-build=true -DskipTests
+#  tags:
+#    - docker
 
 
 integration_test1:
