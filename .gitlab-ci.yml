@@ -20,7 +20,7 @@ foo_bar:
   stage: foo
   image: docker:latest
   script: |
-    echo $gitlab-ci-token
+    docker login registry.example.com
     echo $CI_COMMIT_SHA
   tags:
     - docker
