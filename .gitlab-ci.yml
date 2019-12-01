@@ -6,12 +6,14 @@ variables:
 
 before_script:
   - docker login -u gitlab-ci-token -p "$CI_BUILD_TOKEN" "$CI_REGISTRY"
+  - ./mvnw package -B -Pnative -Dquarkus.native.container-build=true
 
 development:
   stage: deploy
   script:
-    - docker build -t "$CI_REGISTRY_IMAGE:latest" .
-    - docker push "$CI_REGISTRY_IMAGE:latest"
+    - docker build -f src/main/docker/Dockerfile.native -t registry.gitlab.com/marzelwidmer/quarkus-demo-spring-kotlin .
+#    - docker build -t "$CI_REGISTRY_IMAGE:latest" .
+#    - docker push "$CI_REGISTRY_IMAGE:latest"
   only:
     - master
 
