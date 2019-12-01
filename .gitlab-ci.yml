@@ -1,6 +1,14 @@
 stages:
+  - build
   - test
   - deploy
+
+
+
+build:
+  stage: build
+  script: |
+    ./mvnw package -Pnative -Dquarkus.native.container-build=true
 
 test:
   stage: test
