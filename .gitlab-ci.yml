@@ -1,47 +1,48 @@
-image: docker:latest
-services:
-  - docker:dind
-
-variables:
-  DOCKER_DRIVER: overlay
-  SPRING_PROFILES_ACTIVE: gitlab-ci
-
-stages:
-  - build
-  - package
-  - deploy
-
-maven-build:
-  image: maven:3-jdk-8
-  stage: build
-  script: |
-    ./mvnw package -B -Pnative -Dquarkus.native.container-build=true
-
-  artifacts:
-    paths:
-      - target/*.jar
-
-docker-build:
-  stage: package
-  script:
-    - docker build -f src/main/docker/Dockerfile.native -t registry.gitlab.com/marzelwidmer/quarkus-demo-spring-kotlin .
-#    - docker build -t registry.gitlab.com/marcolenzo/actuator-sample .
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
-    - docker push registry.gitlab.com/marzelwidmer/quarkus-demo-spring-kotlin
-    -
-k8s-deploy:
-  image: google/cloud-sdk
-  stage: deploy
-  script:
-    - echo "$GOOGLE_KEY" > key.json
-    - gcloud auth activate-service-account --key-file key.json
-    - gcloud config set compute/zone europe-west1-c
-    - gcloud config set project actuator-sample
-    - gcloud config set container/use_client_certificate True
-    - gcloud container clusters get-credentials actuator-sample
-    - kubectl delete secret registry.gitlab.com
-    - kubectl create secret docker-registry registry.gitlab.com --docker-server=https://registry.gitlab.com --docker-username=marcolenzo --docker-password=$REGISTRY_PASSWD --docker-email=lenzo.marco@gmail.com
-    - kubectl apply -f deployment.yml
+#image: docker:latest
+#
+#services:
+#  - docker:bind
+#
+#variables:
+#  DOCKER_DRIVER: overlay
+#  SPRING_PROFILES_ACTIVE: gitlab-ci
+#
+#stages:
+#  - build
+#  - package
+#  - deploy
+#
+#maven-build:
+#  image: maven:3-jdk-8
+#  stage: build
+#  script: |
+#    ./mvnw package -B -Pnative -Dquarkus.native.container-build=true
+#
+#  artifacts:
+#    paths:
+#      - target/*.jar
+#
+#docker-build:
+#  stage: package
+#  script:
+#    - docker build -f src/main/docker/Dockerfile.native -t registry.gitlab.com/marzelwidmer/quarkus-demo-spring-kotlin .
+##    - docker build -t registry.gitlab.com/marcolenzo/actuator-sample .
+#    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+#    - docker push registry.gitlab.com/marzelwidmer/quarkus-demo-spring-kotlin
+#    -
+#k8s-deploy:
+#  image: google/cloud-sdk
+#  stage: deploy
+#  script:
+#    - echo "$GOOGLE_KEY" > key.json
+#    - gcloud auth activate-service-account --key-file key.json
+#    - gcloud config set compute/zone europe-west1-c
+#    - gcloud config set project actuator-sample
+#    - gcloud config set container/use_client_certificate True
+#    - gcloud container clusters get-credentials actuator-sample
+#    - kubectl delete secret registry.gitlab.com
+#    - kubectl create secret docker-registry registry.gitlab.com --docker-server=https://registry.gitlab.com --docker-username=marcolenzo --docker-password=$REGISTRY_PASSWD --docker-email=lenzo.marco@gmail.com
+#    - kubectl apply -f deployment.yml
 
 
 
@@ -85,41 +86,41 @@ k8s-deploy:
 
 
 
-#image: ebits/openshift-client
-#
-#stages:
-#  - deployToOpenShift
-#
-#variables:
-#  OPENSHIFT_SERVER: https://console.c3smonkey.ch:8443
-#  OPENSHIFT_DOMAIN: apps.c3smonkey.ch
-#  # Configure this variable in Secure Variables:
-#  OPENSHIFT_TOKEN: $TOKEN
-#
-#.deploy: &deploy
-#  before_script:
-#    - oc login "$OPENSHIFT_SERVER" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify
-#  # login with the service account
-#    - oc project "slides-openshift"
-#  # enter into our slides project on OpenShift
-#  script:
-#    - "oc get services $APP 2> /dev/null || oc new-app . --name=$APP"
-#  # create a new application from the image in the OpenShift registry
-#    - "oc start-build $APP --from-dir=. --follow || sleep 3s"
-#  # start a new build
-#    - "oc get routes $APP 2> /dev/null || oc expose service $APP --hostname=$APP_HOST"
-#  # expose our application
-#
-#develop:
-#  <<: *deploy
-#  stage: deployToOpenShift
-#  tags:
-#    - docker
-#  variables:
-#    APP: quarkus-quickstart-native
-#    APP_HOST: development.$OPENSHIFT_DOMAIN
-#  environment:
-#    name: development
-#    url: http://quarkus-quickstart-native.$OPENSHIFT_DOMAIN
-#  except:
-#    - master
+image: ebits/openshift-client
+
+stages:
+  - deployToOpenShift
+
+variables:
+  OPENSHIFT_SERVER: https://console.c3smonkey.ch:8443
+  OPENSHIFT_DOMAIN: apps.c3smonkey.ch
+  # Configure this variable in Secure Variables:
+  OPENSHIFT_TOKEN: $TOKEN
+
+.deploy: &deploy
+  before_script:
+    - oc login "$OPENSHIFT_SERVER" --token="$OPENSHIFT_TOKEN" --insecure-skip-tls-verify
+  # login with the service account
+    - oc project "slides-openshift"
+  # enter into our slides project on OpenShift
+  script:
+    - "oc get services $APP 2> /dev/null || oc new-app . --name=$APP"
+  # create a new application from the image in the OpenShift registry
+    - "oc start-build $APP --from-dir=. --follow || sleep 3s"
+  # start a new build
+    - "oc get routes $APP 2> /dev/null || oc expose service $APP --hostname=$APP_HOST"
+  # expose our application
+
+develop:
+  <<: *deploy
+  stage: deployToOpenShift
+  tags:
+    - docker
+  variables:
+    APP: quarkus-quickstart-native
+    APP_HOST: development.$OPENSHIFT_DOMAIN
+  environment:
+    name: development
+    url: http://quarkus-quickstart-native.$OPENSHIFT_DOMAIN
+  except:
+    - master
