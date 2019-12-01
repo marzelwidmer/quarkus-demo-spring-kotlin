@@ -4,7 +4,11 @@ stages:
 
 test:
   stage: test
-  script: sh test
+  script: |
+    oc new-app --docker-image=marzelwidmer/quarkus-quickstart-native:latest \
+    --name='quarkus-quickstart-native' \
+    -l name='quarkus-quickstart-native' \
+    -e SELECTOR=quarkus
 
 deploy to staging:
   stage: deploy
