@@ -38,16 +38,16 @@ maven-build:
     paths:
       - target/*.jar
 
-
-docker-build:
-  image: docker:latest
-  stage: docker
-  script:
-    - docker build -f src/main/docker/Dockerfile.native -t registry.gitlab.com/marzelwidmer/quarkus-demo-spring-kotlin .
-#    - docker build -t "$CI_REGISTRY_IMAGE:latest" .
-#    - docker push "$CI_REGISTRY_IMAGE:latest"
-  only:
-    - master
+#
+#docker-build:
+#  image: docker:latest
+#  stage: docker
+#  script:
+#    - docker build -f src/main/docker/Dockerfile.native -t registry.gitlab.com/marzelwidmer/quarkus-demo-spring-kotlin .
+##    - docker build -t "$CI_REGISTRY_IMAGE:latest" .
+##    - docker push "$CI_REGISTRY_IMAGE:latest"
+#  only:
+#    - master
 
 
 #image: docker:latest
