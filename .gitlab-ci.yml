@@ -16,12 +16,14 @@ cache:
   paths:
     - .m2/repository
 
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+
 foo_bar:
   stage: foo
   image: docker:latest
   script: |
-    docker login registry.gitlab.com
-    echo $CI_COMMIT_SHA
+     echo $CI_COMMIT_SHA
   tags:
     - docker
 
