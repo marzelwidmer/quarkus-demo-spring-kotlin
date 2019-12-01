@@ -1,6 +1,6 @@
 stages:
   - build
-#  - test
+  - test
   - package
   - prepare
   - deploy
@@ -33,6 +33,15 @@ build_jar:
   tags:
     - docker
 
+build_native_image:
+  stage: build
+  image: maven:3-jdk-8
+  script:
+    - mvn package -B -Pnative -Dquarkus.native.container-build=true
+  tags:
+    - docker
+
+
 integration_test1:
   stage: test
   image: maven:3-jdk-8
@@ -43,15 +52,15 @@ integration_test1:
   tags:
     - docker
 
-integration_test2:
-  stage: test
-  image: maven:3-jdk-8
-  services:
-    - postgres:9.6
-  script:
-    - mvn test
-  tags:
-    - docker
+#integration_test2:
+#  stage: test
+#  image: maven:3-jdk-8
+#  services:
+#    - postgres:9.6
+#  script:
+#    - mvn test
+#  tags:
+#    - docker
 
 docker_push:
   stage: package
