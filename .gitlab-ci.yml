@@ -22,6 +22,8 @@ build_jar:
 
 build_docker:
   stage: build_docker
+  dependencies:
+    - build_jar
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
