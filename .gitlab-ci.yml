@@ -13,7 +13,7 @@ build_src:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   script:
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_TOKEN\"}}}" > /kaniko/.docker/config.json
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
 
 deploy_dev:
@@ -31,6 +31,10 @@ deploy_dev:
 #gitlab docker registry:
 #  image: docker:latest
 #  script: docker login $CI_REGISTRY -u $GITLAB_USERNAME -p $CI_REGISTRY_TOKEN
+
+
+#  error checking push permissions -- make sure you entered the correct tag name, and that you are authenticated correctly, and try again: checking push permission for
+#    "registry.gitlab.com/marzelwidmer/quarkus-demo-spring-kotlin:master": creating push check transport for registry.gitlab.com failed: UNAUTHORIZED: HTTP Basic: Access denied
 
 
 #docker login registry.gitlab.com -u $GITLAB_USERNAME -p $GITLAB_TOKEN
