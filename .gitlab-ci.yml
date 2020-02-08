@@ -25,7 +25,7 @@ deploy_dev:
     - oc create secret generic git-reg --from-file=.dockerconfigjson=config.json --type=kubernetes.io/dockerconfigjson
     - oc secret link default git-reg --for=pull
     - oc delete all -l run=$CI_PROJECT_NAME --wait
-#    - oc run --image=$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME $CI_PROJECT_NAME
+    - oc run --image=$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME $CI_PROJECT_NAME
 
 #gitlab docker registry:
 #  image: docker:latest
