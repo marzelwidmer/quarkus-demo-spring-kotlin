@@ -1,7 +1,32 @@
+image: myhelsana/openshift-cli-skopeo-maven-jdk11:latest
 
-gitlab docker registry:
-  image: docker:latest
-  script: docker login registry.gitlab.com -u $GITLAB_USERNAME -p $GITLAB_TOKEN
+stages:
+  - build
+  - deploy
+
+.build_src:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+
+deploy_dev:
+  stage: deploy
+  script:
+    - oc login $K8S_CLUSTER --token=$K8S_TOKEN --insecure-skip-tls-verify=true
+    - oc project $CI_PROJECT_NAME
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_TOKEN\"}}}" > config.json
+    - oc create secret generic git-reg --from-file=.dockerconfigjson=config.json --type=kubernetes.io/dockerconfigjson
+    - oc secret link default git-reg --for=pull
+    - oc delete all -l run=$CI_PROJECT_NAME --wait
+    - oc run --image=$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME $CI_PROJECT_NAME
+
+#gitlab docker registry:
+#  image: docker:latest
+#  script: docker login $CI_REGISTRY -u $GITLAB_USERNAME -p $CI_REGISTRY_TOKEN
 
 
 #docker login registry.gitlab.com -u $GITLAB_USERNAME -p $GITLAB_TOKEN
