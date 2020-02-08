@@ -39,17 +39,31 @@ hello
 
 
 # Docker
+```bash
+docker login registry.gitlab.com
+Username: marzelwidmer
+Password:
+Login Succeeded
+```
+
 Before building the docker image run:
 ```bash
 ./mvnw package -Pnative -Dquarkus.native.container-build=true
 ```
+
 ## Build
 ```bash
-docker build -f src/main/docker/Dockerfile.native -t marzelwidmer/quarkus-quickstart-native .
+docker build -f src/main/docker/Dockerfile.native -t registry.gitlab.com/marzelwidmer/quarkus-demo-spring-kotlin .
 ```
+
+## Push
+```bash
+docker push registry.gitlab.com/marzelwidmer/quarkus-demo-spring-kotlin
+```
+
 ## Run  
 ```bash
-docker run -i --rm -p 8080:8080 marzelwidmer/quarkus-quickstart-native
+docker run -i --rm -p 8080:8080 registry.gitlab.com/marzelwidmer/quarkus-demo-spring-kotlin
 ```
 
 
@@ -65,6 +79,16 @@ oc new-app --docker-image=marzelwidmer/quarkus-quickstart-native:latest \
     --name='quarkus-quickstart-native' \
     -l name='quarkus-quickstart-native' \
     -e SELECTOR=quarkus
+
+oc new-app --docker-image=marzelwidmer/quarkus-quickstart-native:latest \
+    --name='quarkus-quickstart-native' \
+    -l name='quarkus-quickstart-native' \
+    -e SELECTOR=quarkus --dry-run
+
+oc new-app --docker-image=marzelwidmer/quarkus-quickstart-native:latest \
+    --name='quarkus-quickstart-native' \
+    -l name='quarkus-quickstart-native' \
+    -e SELECTOR=quarkus -o yaml > myapp.yaml
 ```
 
 
@@ -104,4 +128,21 @@ $ oc logs -f dc/quarkus-quickstart-native
 ```
 
 
+# OpenShift 
 
+## Create Service Account For Login
+```bash
+oc create sa cicd
+oc policy add-role-to-user edit system:serviceaccount:cicd:cicd -n cicd
+```
+
+Search for the Token 
+```bash 
+oc describe sa cicd
+oc describe secrets cicd-token-95lk9
+```
+
+Login with Token
+```bash
+oc login $K8S_CLUSTER --token=$K8S_TOKEN --insecure-skip-tls-verify=true
+```

@@ -1,31 +1,43 @@
-stages:
-  - foo
-#  - build
-#  - test
-#  - package
-#  - prepare
-#  - deploy
-#  - stop
 
-variables:
-  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
-  DOCKER_IMAGE_TAGGED: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  DOCKER_IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
-
-cache:
-  paths:
-    - .m2/repository
-
-before_script:
-  - docker login registry.gitlab.com -u gitlab-ci-token -p $CI_BUILD_TOKEN
-
-foo_bar:
-  stage: foo
+gitlab docker registry:
   image: docker:latest
-  script: |
-     echo $CI_COMMIT_SHA
-  tags:
-    - docker
+  script: docker login registry.gitlab.com -u $GITLAB_USERNAME -p $GITLAB_TOKEN
+
+
+#docker login registry.gitlab.com -u $GITLAB_USERNAME -p $GITLAB_TOKEN
+#oc login $K8S_CLUSTER --token=$K8S_TOKEN --insecure-skip-tls-verify=true
+
+
+#stages:
+#  - foo
+##  - build
+##  - test
+##  - package
+##  - prepare
+##  - deploy
+##  - stop
+#
+#variables:
+#  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+#  DOCKER_IMAGE_TAGGED: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+#  DOCKER_IMAGE_LATEST: $CI_REGISTRY_IMAGE:latest
+#
+#cache:
+#  paths:
+#    - .m2/repository
+#
+#before_script:
+#  - docker login registry.gitlab.com
+#
+#
+#foo_bar:
+#  stage: foo
+#  image: docker:latest
+#  script: |
+#     echo $CI_COMMIT_SHA
+#  tags:
+#    - docker
+
 
 #build_jar:
 #  stage: build
