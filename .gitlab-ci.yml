@@ -1,7 +1,8 @@
 image: myhelsana/openshift-cli-skopeo-maven-jdk11:latest
 
 stages:
-  - build
+  - build_jar
+  - build_docker
   - deploy
 
 variables:
@@ -10,15 +11,20 @@ variables:
 
 
 
+build_jar:
+  stage: build_jar
+  script:
+    - mvn package -Pnative -Dquarkus.native.container-build=true
+  artifacts:
+    paths:
+      - target/*.jar
 
-
-build_src:
-  stage: build
+build_docker:
+  stage: build_docker
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   script:
-    - ./mvnw package -Pnative -Dquarkus.native.container-build=true
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_TOKEN\"}}}" > /kaniko/.docker/config.json
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/$DOCKERFILE_LOCATION --destination $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
 
