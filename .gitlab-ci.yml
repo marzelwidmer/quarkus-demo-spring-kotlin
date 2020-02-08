@@ -24,6 +24,7 @@ build_jar:
   artifacts:
     paths:
       - target/*.jar
+    expire_in: 1 week
 
 build_docker:
   stage: build_docker
