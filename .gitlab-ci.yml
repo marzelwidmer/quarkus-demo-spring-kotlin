@@ -7,7 +7,7 @@ stages:
 variables:
   CI_PROJECT_NAME: cicd
 
-.build_src:
+build_src:
   stage: build
   image:
     name: gcr.io/kaniko-project/executor:debug
