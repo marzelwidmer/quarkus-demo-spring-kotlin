@@ -14,7 +14,7 @@ variables:
 build_jar:
   stage: build_jar
   script:
-    - mvn package -Pnative -Dquarkus.native.container-build=true
+    - mvn package
   artifacts:
     paths:
       - target/*.jar
