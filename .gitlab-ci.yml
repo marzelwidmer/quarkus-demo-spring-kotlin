@@ -9,8 +9,11 @@ variables:
   CI_PROJECT_NAME: cicd
   APPLICATION_NAME: quarkus
   DOCKERFILE_LOCATION: src/main/docker/Dockerfile.native
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2"
 
-
+cache:
+  paths:
+    - .m2/
 
 build_jar:
   stage: build_jar
