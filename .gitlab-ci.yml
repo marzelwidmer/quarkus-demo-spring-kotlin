@@ -22,7 +22,7 @@ deploy_dev:
     - oc login $K8S_CLUSTER --token=$K8S_TOKEN --insecure-skip-tls-verify=true
     - oc project $CI_PROJECT_NAME
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_TOKEN\"}}}" > config.json
-    - oc delete sa git-reg
+    - oc delete secrets/git-reg
     - oc create secret generic git-reg --from-file=.dockerconfigjson=config.json --type=kubernetes.io/dockerconfigjson
     - oc secret link default git-reg --for=pull
     - oc delete all -l run=$CI_PROJECT_NAME --wait
