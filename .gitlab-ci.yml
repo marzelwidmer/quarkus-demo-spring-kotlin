@@ -19,6 +19,8 @@ build_jar:
   stage: build_jar
   script:
     - mvn package
+    - ls -la target/
+    - cat $CI_PROJECT_DIR/$DOCKERFILE_LOCATION
   artifacts:
     paths:
       - target/*.jar
